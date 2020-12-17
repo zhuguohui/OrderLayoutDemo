@@ -29,7 +29,6 @@ import java.util.Map;
  */
 public class TRSOrderLayout extends LinearLayout {
 
-    List<Integer> orderIds = new ArrayList<>();
     Map<View, String> contentMap = new HashMap<>();
     View setView;//正在设置text的view
     private List<TextView> orderView = new ArrayList<>();
@@ -44,18 +43,6 @@ public class TRSOrderLayout extends LinearLayout {
 
     public TRSOrderLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.TRSOrderLayout);
-        String orderText = array.getString(R.styleable.TRSOrderLayout_textOrder);
-        if (!TextUtils.isEmpty(orderText)) {
-            String[] ids = orderText.split(",");
-            for (int i = 0; i < ids.length; i++) {
-                int id = getResources().getIdentifier(ids[i], "id", context.getPackageName());
-                if (id != 0) {
-                    orderIds.add(id);
-                }
-            }
-        }
-        array.recycle();
     }
 
     @Override
