@@ -13,7 +13,7 @@
         android:layout_centerInParent="true"
         android:background="#aaa"
         android:orientation="horizontal"
-        app:textOrder="tv_source,tv_time,tv_tag">
+    >
 
 
         <TextView

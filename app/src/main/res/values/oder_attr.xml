@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="TRSOrderLayout">
-        <attr name="textOrder" format="string" />
-
-    </declare-styleable>
     <declare-styleable name="TRSOrderLayout_layout">
         <!--显示的优先级 默认为1 优先级越高，越先显示-->
         <attr name="layout_order_index" format="integer" />
