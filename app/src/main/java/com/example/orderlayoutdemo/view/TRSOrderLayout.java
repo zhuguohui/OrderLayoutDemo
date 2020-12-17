@@ -2,15 +2,16 @@ package com.example.orderlayoutdemo.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 
 import androidx.annotation.Nullable;
 
@@ -18,10 +19,11 @@ import com.example.orderlayoutdemo.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 在布局时，优先考虑优先级高的view。
@@ -31,6 +33,8 @@ public class TRSOrderLayout extends LinearLayout {
 
     Map<View, String> contentMap = new HashMap<>();
     View setView;//正在设置text的view
+    Set<View> hideViewSet = new HashSet<>();
+
     private List<TextView> orderView = new ArrayList<>();
 
     public TRSOrderLayout(Context context) {
@@ -84,8 +88,11 @@ public class TRSOrderLayout extends LinearLayout {
         int totalWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
         boolean hideAll = false;
         for (TextView textView : orderView) {
+            if (hideViewSet.contains(textView)) {
+                textView.setVisibility(GONE);
+                continue;
+            }
             if (hideAll) {
-
                 textView.setVisibility(GONE);
                 continue;
             }
@@ -139,8 +146,19 @@ public class TRSOrderLayout extends LinearLayout {
 
     }
 
+    public void hideView(View view) {
+        hideViewSet.add(view);
+        requestLayout();
+    }
+
+    public void showView(View view) {
+        hideViewSet.remove(view);
+        requestLayout();
+    }
+
     /**
      * 获取textView最原始的内容。
+     *
      * @param textView
      * @return
      */
@@ -183,7 +201,7 @@ public class TRSOrderLayout extends LinearLayout {
      */
     private int measureTextViewLength(TextView textView) {
 
-        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) textView.getLayoutParams();
+        MarginLayoutParams lp = (MarginLayoutParams) textView.getLayoutParams();
         return (int) (textView.getPaint().measureText(contentMap.get(textView).toString())
                 + textView.getCompoundPaddingStart()
                 + textView.getCompoundPaddingEnd()
@@ -213,7 +231,7 @@ public class TRSOrderLayout extends LinearLayout {
     }
 
 
-    public static class OrderLayoutParams extends LinearLayout.LayoutParams {
+    public static class OrderLayoutParams extends LayoutParams {
         private int orderIndex = 1;
         private CompressMode compressMode = CompressMode.HIDE;
         private int ellipsesMinSize = 1;

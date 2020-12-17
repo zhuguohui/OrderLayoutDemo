@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -78,6 +79,35 @@ public class MainActivity extends AppCompatActivity {
                 clickListeners[i].onClick(null);
             }
         });
+    }
+
+
+    private void hideView(View view) {
+        if (view == null) {
+            return;
+        }
+
+        ViewParent viewParent = view.getParent();
+        if (viewParent instanceof TRSOrderLayout) {
+            TRSOrderLayout orderLayout = (TRSOrderLayout) viewParent;
+            orderLayout.hideView(view);
+        } else {
+            view.setVisibility(View.GONE);
+        }
+    }
+
+    private void showView(View view) {
+        if (view == null) {
+            return;
+        }
+
+        ViewParent viewParent = view.getParent();
+        if (viewParent instanceof TRSOrderLayout) {
+            TRSOrderLayout orderLayout = (TRSOrderLayout) viewParent;
+            orderLayout.showView(view);
+        } else {
+            view.setVisibility(View.VISIBLE);
+        }
     }
 
     private void changeSize(int size) {

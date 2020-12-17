@@ -107,7 +107,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="最少显示字数:"
+                android:text="最少字数:"
                 android:textSize="13dp" />
 
             <EditText
@@ -166,7 +166,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="最少显示字数:"
+                android:text="最少字数:"
                 android:textSize="13dp" />
 
             <EditText
@@ -225,7 +225,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="最少显示字数:"
+                android:text="最少字数:"
                 android:textSize="13dp" />
 
             <EditText
