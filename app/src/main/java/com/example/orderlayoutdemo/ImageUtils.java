@@ -42,7 +42,7 @@ public class ImageUtils {
         float[] scale=getScaleFromHube(hue0,hue1,hue2,hue3);
       //  lumMatrix.setScale(scale[0],scale[1],scale[2],scale[3]);
         //将三种效果融合起来
-       // hue0=getHub(Color.parseColor("#F0FAFF"),Color.parseColor("#FF3168"));
+        hue0=getHub(Color.parseColor("#36A7F2"),Color.parseColor("#E24C4B"));
         ColorMatrix cm = new ColorMatrix();
         ColorMatrix tmp = new ColorMatrix();
 
@@ -98,7 +98,7 @@ public class ImageUtils {
         return hsv2[0]-hsv1[0];*/
         int[] yuv1 = convertRGB2YUV(fromColor);
         int[] yuv2 = convertRGB2YUV(targetColor);
-        return yuv2[0]-yuv1[1];
+        return (yuv2[2]-yuv1[2])*1.0f/255*180;
     }
 
     private static float[] getScale(int fromColor,int targetColor){
