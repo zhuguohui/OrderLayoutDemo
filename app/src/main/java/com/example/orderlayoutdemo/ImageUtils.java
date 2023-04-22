@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.util.Log;
 
 /**
  * <pre>
@@ -16,33 +17,16 @@ import android.graphics.Paint;
  * </pre>
  */
 public class ImageUtils {
-    public static Bitmap handleImageEffect(Bitmap bitmap, float hue0,float hue1,float hue2,float hue3, float saturation, float lum){
+    public static Bitmap handleImageEffect(Bitmap bitmap,int targetColor){
         //由于不能直接在原图上修改，所以创建一个图片，设定宽度高度与原图相同。为32位ARGB图片
         Bitmap currentBitmap = Bitmap.createBitmap(bitmap.getWidth(),bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         //创建一个和原图相同大小的画布
         Canvas canvas = new Canvas(currentBitmap);
         //创建笔刷并设置抗锯齿
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        //色相ColorMatrix
-        ColorMatrix hueMatrix = new ColorMatrix();
-//        Log.i("zzz", "handleImageEffect: hue="+hue);
-     //   hue0=getHub(Color.parseColor("#F0FAFF"),Color.parseColor("#FF8000"));
-//        hueMatrix.setRGB2YUV();
-//        hueMatrix.setRotate(0,hue0);
-//        hueMatrix.setYUV2RGB();
-      //  hueMatrix.setRotate(1,hue0);
-       // hueMatrix.setRotate(2,hue0);
-        //饱和度ColorMatrix
-      //  ColorMatrix saturationMatrix = new ColorMatrix();
-       // saturationMatrix.setSaturation(saturation);
-        //亮度ColorMatrix
-     //   ColorMatrix lumMatrix = new ColorMatrix();
-      //  lumMatrix.setScale(lum,lum,lum,1);
-     //   float[] scale = getScale(Color.parseColor("#F0FAFF"), Color.parseColor("#C8161D"));
-        float[] scale=getScaleFromHube(hue0,hue1,hue2,hue3);
-      //  lumMatrix.setScale(scale[0],scale[1],scale[2],scale[3]);
-        //将三种效果融合起来
-        hue0=getHub(Color.parseColor("#36A7F2"),Color.parseColor("#E24C4B"));
+
+        float hue0=getHub(Color.parseColor("#61BCF8"),targetColor);
+
         ColorMatrix cm = new ColorMatrix();
         ColorMatrix tmp = new ColorMatrix();
 
@@ -53,21 +37,11 @@ public class ImageUtils {
         cm.postConcat(tmp);
 
 
-//        ColorMatrix imageMatrix = new ColorMatrix();
-//        imageMatrix.postConcat(cm);
-
-
-       // imageMatrix.postConcat(saturationMatrix);
-      //  imageMatrix.postConcat(lumMatrix);
-
         paint.setColorFilter(new ColorMatrixColorFilter(cm));
         canvas.drawBitmap(bitmap,0,0,paint);
         return currentBitmap;
     }
 
-    private static float[] getScaleFromHube(float hue0, float hue1, float hue2,float hue3) {
-        return new float[]{hue0/180,hue1/180,hue2/180,hue3/180};
-    }
 
 
     private static int[] convertRGB2YUV(int color) {
@@ -80,8 +54,8 @@ public class ImageUtils {
         int b = Color.blue(color);
         int[] result = new int[3];
         result[0] = floatToByte(yuvArray[0] * r + yuvArray[1] * g + yuvArray[2] * b);
-        result[1] = floatToByte(yuvArray[5] * r + yuvArray[6] * g + yuvArray[7] * b) + 127;
-        result[2] = floatToByte(yuvArray[10] * r + yuvArray[11] * g + yuvArray[12] * b) + 127;
+        result[1] = floatToByte(yuvArray[5] * r + yuvArray[6] * g + yuvArray[7] * b) ;
+        result[2] = floatToByte(yuvArray[10] * r + yuvArray[11] * g + yuvArray[12] * b) ;
         return result;
     }
 
@@ -91,35 +65,36 @@ public class ImageUtils {
     }
 
     public static float getHub(int fromColor,int targetColor){
-    /*    float[] hsv1=new float[3];
-        float[] hsv2=new float[3];
-        Color.colorToHSV(fromColor,hsv1);
-        Color.colorToHSV(targetColor,hsv2);
-        return hsv2[0]-hsv1[0];*/
+
         int[] yuv1 = convertRGB2YUV(fromColor);
         int[] yuv2 = convertRGB2YUV(targetColor);
-        return (yuv2[2]-yuv1[2])*1.0f/255*180;
+        //计算两个颜色的uv分量组成的向量之间的夹角
+        return getDegreeBetweenVectors(new int[]{yuv1[1], yuv1[2]}, new int[]{yuv2[1], yuv2[2]});
     }
 
-    private static float[] getScale(int fromColor,int targetColor){
-        int r1 = Color.red(fromColor);
-        int g1 = Color.green(fromColor);
-        int b1 = Color.blue(fromColor);
+    /**
+     * 计算向量1，顺时针旋转多少度可以得到向量2
+     * 返回的度数为0到360度
+     * @param vs1
+     * @param vs2
+     * @return
+     */
+    private static float getDegreeBetweenVectors(int[] vs1,int[] vs2 ){
+        double cosDegree=0;
+        //向量的内积
+        int nj = vs1[0] * vs2[0] + vs1[1] * vs2[1];
+        //叉积
+        int cj=vs1[0]*vs2[1]-vs1[1]*vs2[0];
+        double bl = Math.sqrt(vs1[0] * vs1[0] + vs1[1] * vs1[1]) *Math.sqrt(vs2[0] * vs2[0] + vs2[1] * vs2[1]);
 
-        int r2 = Color.red(targetColor);
-        int g2 = Color.green(targetColor);
-        int b2 = Color.blue(targetColor);
+        cosDegree= (nj/bl);
+        double degree = Math.acos(cosDegree) / Math.PI * 180;
+        //叉积大于0，表示向量2 在向量1的左边
 
-        float[] result=new float[3];
-//        result[0]=(r2-r1)*1.0f/255;
-//        result[1]=(g2-g1)*1.0f/255;
-//        result[2]=(b2-b1)*1.0f/255;
+        degree = (float) (cj > 0 ? 360- degree : degree);
 
-        result[0]=r2*1.0f/255;
-        result[1]=r2*1.0f/255;
-        result[2]=r2*1.0f/255;
-
-        return result;
-
+        return (float) degree;
     }
+
+
 }
